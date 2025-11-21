@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Windows 11 - ULTIMATE 2025 Edition</title>
+<style>
+  body,html{margin:0;padding:0;height:100%;overflow:hidden;font-family:"Segoe UI",Arial,sans-serif;background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb') center/cover fixed;}
+  #desktop{position:relative;width:100%;height:100%;}
+  .icon{position:absolute;width:92px;text-align:center;cursor:pointer;padding:10px;border-radius:12px;transition:0.2s;}
+  .icon:hover{background:rgba(255,255,255,0.2);transform:scale(1.15);}
+  .icon img{width:56px;height:56px;}
+  .icon span{display:block;margin-top:8px;background:rgba(0,0,0,0.6);border-radius:6px;padding:6px;font-size:13px;}
+
+  #taskbar{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);height:60px;background:rgba(10,10,10,0.95);backdrop-filter:blur(40px);border-radius:20px;padding:0 30px;display:flex;align-items:center;z-index:9999;box-shadow:0 -10px 40px rgba(0,0,0,0.5);}
+  #start-btn{width:50px;height:50px;background:url('https://win11.reactos.org/img/start.png') center/36px no-repeat;cursor:pointer;border-radius:12px;}
+  #start-btn:hover{background-color:rgba(255,255,255,0.25);}
+  .taskbar-icon{width:50px;height:50px;margin:0 8px;background:center/40px no-repeat;cursor:pointer;border-radius:10px;position:relative;}
+  .taskbar-icon.open::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:30px;height:3px;background:white;border-radius:2px;}
+  #clock{margin-left:auto;color:white;font-weight:600;font-size:14px;text-align:center;}
+
+  #start-menu{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) scale(0.9);width:760px;height:680px;background:rgba(25,25,25,0.98);backdrop-filter:blur(40px);border-radius:24px;display:none;overflow:hidden;box-shadow:0 50px 100px rgba(0,0,0,0.9);z-index:9998;}
+  #start-menu.open{display:block;animation:pop 0.35s forwards;}
+  @keyframes pop{to{transform:translateX(-50%) scale(1);}}
+
+  .window{position:absolute;background:white;color:black;border-radius:16px;box-shadow:0 30px 120px rgba(0,0,0,0.7);overflow:hidden;display:none;min-width:320px;min-height:220px;resize:both;}
+  .window.open{display:block;}
+  .title-bar{height:46px;background:linear-gradient(#f8f8f8,#e8e8e8);display:flex;align-items:center;padding:0 16px;cursor:move;border-top-left-radius:16px;border-top-right-radius:16px;}
+  .title-bar span{flex:1;font-weight:600;}
+  .title-btns button{width:14px;height:14px;border-radius:50%;margin-left:12px;border:none;}
+  .close{background:#ff5f57;}.minimize{background:#ffbd2e;}.maximize{background:#28c940;}
+
+  #bsod,#ransomware{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;color:white;font-size:40px;z-index:999999;}
+  #bsod{background:#00008B;}
+  #ransomware{background:red;}
+  canvas{background:white;}
+  #cmd-output{background:#000;color:#0f0;font-family:consolas;padding:15px;height:calc(100% - 60px);overflow:auto;}
+  #cmd-input{width:100%;background:#000;color:#0f0;border:none;outline:none;font-family:consolas;font-size:16px;padding:10px;}
+</style>
+</head>
+<body oncontextmenu="showContext(event);return false;">
+
+<audio id="startup" src="https://www.myinstants.com/media/sounds/windows-xp-startup.mp3" autoplay></audio>
+
+<div id="desktop">
+  <!-- Desktop Icons -->
+  <div class="icon" style="top:20px;left:20px" ondblclick="openApp('explorer')"><img src="https://win11.reactos.org/img/folder.png"><span>This PC</span></div>
+  <div class="icon" style="top:140px;left:20px" ondblclick="openApp('notepad')"><img src="https://win11.reactos.org/img/notepad.png"><span>Notepad</span></div>
+  <div class="icon" style="top:260px;left:20px" ondblclick="openApp('paint')"><img src="https://win11.reactos.org/img/paint.png"><span>Paint</span></div>
+  <div class="icon" style="top:380px;left:20px" ondblclick="openApp('cmd')"><img src="https://win11.reactos.org/img/cmd.png"><span>CMD</span></div>
+  <div class="icon" style="top:500px;left:20px" ondblclick="openApp('minesweeper')"><img src="https://win11.reactos.org/img/minesweeper.png"><span>Minesweeper</span></div>
+  <div class="icon" style="top:20px;left:140px" ondblclick="openApp('solitaire')"><img src="https://win11.reactos.org/img/solitaire.png"><span>Solitaire</span></div>
+  <div class="icon" style="top:140px;left:140px" ondblclick="openApp('edge')"><img src="https://win11.reactos.org/img/edge.png"><span>Edge</span></div>
+  <div class="icon" style="top:20px;right:20px" ondblclick="ransomware()"><img src="https://win11.reactos.org/img/virus.png"><span>virus.exe</span></div>
+
+  <!-- Right-click Menu -->
+  <div id="context-menu" style="position:absolute;background:rgba(40,40,40,0.98);border-radius:12px;padding:10px 0;box-shadow:0 20px 50px rgba(0,0,0,0.7);display:none;z-index:10000;">
+    <div class="ctx-item" onclick="bsod()">💀 Trigger BSOD</div>
+    <div class="ctx-item" onclick="ransomware()">🦠 Activate Ransomware</div>
+    <div class="ctx-item" onclick="alert('God Mode Activated')">🌀 God Mode</div>
+  </div>
+
+  <!-- Taskbar -->
+  <div id="taskbar">
+    <div id="start-btn" onclick="toggleStart()"></div>
+    <div class="taskbar-icon" style="background-image:url('https://win11.reactos.org/img/explorer.png')" onclick="openApp('explorer')"></div>
+    <div class="taskbar-icon" style="background-image:url('https://win11.reactos.org/img/edge.png')" onclick="openApp('edge')"></div>
+    <div id="clock">88:88 AM<br>11/21/2025</div>
+  </div>
+
+  <!-- Start Menu -->
+  <div id="start-menu">
+    <div style="padding:50px;text-align:center;color:white;">
+      <h1>Windows 11 ULTIMATE</h1>
+      <p>The most chaotic fake OS ever built</p>
+    </div>
+  </div>
+
+  <!-- Windows -->
+  <div id="explorer" class="window open" style="width:1000px;height:700px;top:50px;left:100px;">
+    <div class="title-bar"><span>File Explorer</span><div class="title-btns"><button class="close" onclick="closeApp('explorer')"></button></div></div>
+    <div class="content" style="padding:30px;font-size:20px;">Welcome to the ultimate fake Windows 11! 💀🚀</div>
+  </div>
+
+  <div id="paint" class="window" style="width:950px;height:650px;">
+    <div class="title-bar"><span>Paint</span><div class="title-btns"><button class="close" onclick="closeApp('paint')"></button></div></div>
+    <div class="content">
+      <canvas id="paintCanvas" width="930" height="580"></canvas>
+      <div style="padding:10px;background:#f0f0f0;">Color: <input type="color" id="colorPicker" value="#000000"> <button onclick="ctx.fillStyle='white';ctx.fillRect(0,0,930,580)">Clear</button></div>
+    </div>
+  </div>
+
+  <div id="cmd" class="window" style="width:800px;height:600px;background:#000;color:#0f0;">
+    <div class="title-bar" style="background:#000;color:#0f0;"><span>C:\Windows\System32\cmd.exe</span><div class="title-btns"><button class="close" onclick="closeApp('cmd')"></button></div></div>
+    <div class="content"><div id="cmd-output">Microsoft Windows [Version 10.0.99999]<br>Type 'help' for commands<br><br>C:\Users\Guest></div><input id="cmd-input" onkeydown="if(event.keyCode==13) runCommand(this.value);this.value='';"></div>
+  </div>
+
+  <div id="solitaire" class="window" style="width:1000px;height:700px;"><div class="title-bar"><span>Solitaire</span><div class="title-btns"><button class="close" onclick="closeApp('solitaire')"></button></div></div><div class="content"><iframe src="https://solitaire.ee" style="width:100%;height:100%;border:none;"></iframe></div></div>
+
+  <div id="edge" class="window" style="width:1100px;height:700px;"><div class="title-bar"><span>Microsoft Edge</span><div class="title-btns"><button class="close" onclick="closeApp('edge')"></button></div></div><div class="content"><iframe src="https://bing.com" style="width:100%;height:100%;border:none;"></iframe></div></div>
+
+</div>
+
+<!-- Prank Screens -->
+<div id="bsod"><div>:(<br><br>Your PC ran into a problem<br>ERROR: TOO_MUCH_CHAOS<br><br>💀</div></div>
+<div id="ransomware" onclick="this.style.display='none'">YOUR FILES ARE ENCRYPTED!<br>Send 10 BTC or refresh 😂</div>
+
+<script>
+function toggleStart(){document.getElementById('start-menu').classList.toggle('open');}
+function showContext(e){const m=document.getElementById('context-menu');m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';m.style.display='block';document.onclick=()=>m.style.display='none';}
+function bsod(){document.getElementById('bsod').style.display='flex';setTimeout(()=>location.reload(),8000);}
+function ransomware(){document.getElementById('ransomware').style.display='flex';for(let i=0;i<30;i++)setTimeout(()=>alert('VIRUS!!!'),i*200);setTimeout(()=>window.location='https://www.youtube.com/watch?v=dQw4w9WgXcQ',4000);}
+
+function openApp(id){document.getElementById(id).classList.add('open');}
+function closeApp(id){document.getElementById(id).classList.remove('open');}
+
+// Clock
+setInterval(()=>{const d=new Date();document.getElementById('clock').innerHTML=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'<br>'+d.toLocaleDateString();},1000);
+
+// Paint
+const canvas=document.getElementById('paintCanvas');if(canvas){const ctx=canvas.getContext('2d');let drawing=false;canvas.onmousedown=()=>drawing=true;canvas.onmouseup=()=>drawing=false;canvas.onmousemove=e=>{if(drawing){ctx.fillStyle=document.getElementById('colorPicker').value;ctx.fillRect(e.offsetX-5,e.offsetY-5,10,10);}};} 
+
+// CMD
+function runCommand(cmd){
+  const output=document.getElementById('cmd-output');
+  output.innerHTML += cmd + '<br>';
+  if(cmd==='help') output.innerHTML += 'dir, rickroll, matrix, bsod, clear<br>';
+  if(cmd==='rickroll') window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+  if(cmd==='bsod') bsod();
+  if(cmd==='clear') output.innerHTML = 'Microsoft Windows [Version 10.0.99999]<br><br>C:\\Users\\Guest>';
+  output.innerHTML += '<br>C:\\Users\\Guest>';
+  output.scrollTop = output.scrollHeight;
+}
+
+// Dragging
+document.querySelectorAll('.title-bar').forEach(bar=>{bar.onmousedown=e=>{if(e.target.tagName==='BUTTON')return;let win=bar.parentNode;let shiftX=e.clientX-win.getBoundingClientRect().left;let shiftY=e.clientY-win.getBoundingClientRect().top;document.onmousemove=e=>{win.style.left=(e.clientX-shiftX)+'px';win.style.top=(e.clientY-shiftY)+'px';};document.onmouseup=()=>document.onmousemove=null;};});
+</script>
+</body>
+</html>
